@@ -1,4 +1,4 @@
-#include <connection.h>
+#include "../common/connection.h"
 #include <stdio.h>
 
 SOCKET_HANDLE connect_to_ip(char* address, int port){
