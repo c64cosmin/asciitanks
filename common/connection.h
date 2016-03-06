@@ -15,6 +15,9 @@ void send_data(SOCKET_HANDLE sh, void* data, int data_size);
 //if there is no data to receive it will return 0
 void* recv_data(SOCKET_HANDLE sh, int* data_size);
 
+//creates a server socket
+SOCKET_HANDLE create_socket(char* address, int port);
+
 //makes the server socket listen for incomming connections
 //returns a new connection when some one connected
 SOCKET_HANDLE listen_for_connection(SOCKET_HANDLE sh);
