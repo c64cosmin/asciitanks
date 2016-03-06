@@ -1,9 +1,11 @@
-#include "common/listening.h"
+#include "listening.h"
+#include <string.h>
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <stdio.h>
+#include <netinet/in.h>
 
-void listen(char* address, int port){
+void listening(char* address, int port){
     int socketfd;
     
     socketfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -17,11 +19,11 @@ void listen(char* address, int port){
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
-    addr.sin_addr.s_addr = inet_addr(adress);
-    memset(addr.sin_zero, 0, sizeof(addr.sin_zero);
+    addr.sin_addr.s_addr = inet_addr(address);
+    memset(addr.sin_zero, 0, sizeof(addr.sin_zero));
 
     //bind the socket to the requested address
-    int errorno = bind(socketfd, &addr, sizeof(addr));
+    int errorno = bind(socketfd, (struct sockaddr*)&addr, sizeof(addr));
 
     if(errorno == -1){
         printf("ERROR: Cannot bind the socket for %s:%i\n", address, port);
@@ -29,15 +31,21 @@ void listen(char* address, int port){
     }
 
     socklen_t addr_size;
-    sockaddr_storage new_addr;
+    struct sockaddr_in new_addr;
     int newsocketfd;
 
-    while(true){
+    printf("Started listening on %s:%i\n", address, port);
+
+    while(1){
         listen(socketfd, 10);
         addr_size = sizeof(new_addr);
         newsocketfd = accept(socketfd, (struct sockaddr*)&new_addr, &addr_size);
-
-        char *new_ip = inet_ntoa(((sockaddr_in)new_addr).sin_addr);
-        printf("%s has connected\n", new_ip);
+        
+        //byte by byte printing to get the IPv4 address of the conectee
+        printf("%u.%u.%u.%u has connected\n",
+               ((unsigned char*)&new_addr.sin_addr.s_addr)[0],
+               ((unsigned char*)&new_addr.sin_addr.s_addr)[1],
+               ((unsigned char*)&new_addr.sin_addr.s_addr)[2],
+               ((unsigned char*)&new_addr.sin_addr.s_addr)[3]);
     }
 }
