@@ -4,8 +4,16 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <pthread.h>
 
-void listening(char* address, int port){
+struct listening_thread_args{
+    char* address;
+    int port;
+};
+
+void* listening_impl(void* args){
+    char* address = ((struct listening_thread_args*)args)->address;
+    int port = ((struct listening_thread_args*)args)->port;
     int socketfd;
     
     socketfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -47,5 +55,17 @@ void listening(char* address, int port){
                ((unsigned char*)&new_addr.sin_addr.s_addr)[1],
                ((unsigned char*)&new_addr.sin_addr.s_addr)[2],
                ((unsigned char*)&new_addr.sin_addr.s_addr)[3]);
+    }
+}
+
+void listening(char* address, int port){
+    struct listening_thread_args args;
+    args.address = address;
+    args.port = port;
+    
+    pthread_t thread_id;
+    int errorno = pthread_create(&thread_id, 0, listening_impl, (void*)&args);
+    if(errorno){
+        printf("ERROR: Cannot create a new thread\n");
     }
 }
