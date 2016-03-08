@@ -35,9 +35,9 @@ connection new_connection(char* address, int port){
     //create a new connection object
     struct _connection* conn=(struct _connection*)malloc(sizeof(struct _connection));
     //copy the socket descriptor
-    conn->socketfd = socketfd;
+    conn->socket_fd = socketfd;
     //initialize a new mutex for the connection
-    pthread_mutex_init(&conn->lock);
+    pthread_mutex_init(&conn->lock, 0);
     //create a new thread for the connection
     create_messaging_thread(conn);
 
@@ -50,7 +50,7 @@ void send_string(connection conn, char* msg, int size){
 void recv_string(connection conn, char* msg, int size){
 }
 
-void create_messaging_thread(_connection* conn){
+void create_messaging_thread(struct _connection* conn){
 }
 
 void* messaging_thread(void* args){

@@ -16,7 +16,7 @@ struct listening_thread_args{
     int* connections;
 };
 
-void get_connections(connection* conn){
+void get_connections(int* conn){
     pthread_mutex_lock(&connection_list_lock);
     memcpy(conn, connections, sizeof(int) * MAX_CONNECTION_NO);
     pthread_mutex_unlock(&connection_list_lock);
@@ -104,7 +104,7 @@ void listening(char* address, int port){
     args->connections = connections;
 
     //inialize the mutex
-    pthread_mutex_init(&connection_list_lock);
+    pthread_mutex_init(&connection_list_lock, 0);
 
     pthread_t thread_id;
     int errorno = pthread_create(&thread_id, 0, listening_impl, (void*)args);

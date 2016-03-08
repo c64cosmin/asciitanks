@@ -8,7 +8,7 @@ struct _connection{
     pthread_mutex_t lock;
 };
 
-void create_messaging_thread(_connection* conn);
+void create_messaging_thread(struct _connection* conn);
 void* messaging_thread(void* args);
 
 #endif //_MESSAGING_IMPL_
