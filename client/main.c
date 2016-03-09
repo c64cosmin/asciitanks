@@ -10,5 +10,6 @@ int main(int argn, char** argv){
     int port = atoi(argv[2]);
 
     connection c = new_connection(address, port);
+    while(1);
     return 0;
 }

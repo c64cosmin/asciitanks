@@ -1,4 +1,6 @@
 #include "listening.h"
+#include "messaging.h"
+#include "messaging_impl.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,18 +9,18 @@
 #include <netinet/in.h>
 #include <pthread.h>
 
-int* connections;
+connection* connections;
 pthread_mutex_t connection_list_lock;
 
 struct listening_thread_args{
     char* address;
     int port;
-    int* connections;
+    connection* connections;
 };
 
-void get_connections(int* conn){
+void get_connections(connection* conn){
     pthread_mutex_lock(&connection_list_lock);
-    memcpy(conn, connections, sizeof(int) * MAX_CONNECTION_NO);
+    memcpy(conn, connections, sizeof(connection) * MAX_CONNECTION_NO);
     pthread_mutex_unlock(&connection_list_lock);
 }
 
@@ -26,7 +28,7 @@ void* listening_impl(void* args){
     struct listening_thread_args arg = *(struct listening_thread_args*)args;
     char* address = arg.address;
     int port = arg.port;
-    int* connections = arg.connections;
+    connection* connections = arg.connections;
     int socketfd;
     
     socketfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -58,7 +60,7 @@ void* listening_impl(void* args){
     //initialize the connection list
     int i;
     for(i=0;i<MAX_CONNECTION_NO;i++){
-        connections[i] = -1;
+        connections[i] = 0;
     }
 
     errorno = listen(socketfd, 10);
@@ -75,7 +77,7 @@ void* listening_impl(void* args){
         i=0;
         pthread_mutex_lock(&connection_list_lock);
         //find a empty connection slot
-        while(connections[i]!=-1 && i<MAX_CONNECTION_NO){
+        while(connections[i]!=0 && i<MAX_CONNECTION_NO){
             i++;
         }
         //did we find any empty slot?
@@ -86,7 +88,10 @@ void* listening_impl(void* args){
                    ((unsigned char*)&new_addr.sin_addr.s_addr)[1],
                    ((unsigned char*)&new_addr.sin_addr.s_addr)[2],
                    ((unsigned char*)&new_addr.sin_addr.s_addr)[3]);
-            connections[i] = newsocketfd;
+            struct _connection* conn = (struct _connection*) malloc(sizeof(struct _connection));
+            conn->socket_fd = newsocketfd;
+            connections[i] = (connection)(void*)conn;
+            create_messaging_thread(conn);
         }
         else{
             //refuse connection
@@ -97,7 +102,7 @@ void* listening_impl(void* args){
 }
 
 void listening(char* address, int port){
-    connections = (int*)malloc(sizeof(int) * MAX_CONNECTION_NO);
+    connections = (connection*)malloc(sizeof(connection) * MAX_CONNECTION_NO);
     struct listening_thread_args *args = (struct listening_thread_args*)malloc(sizeof(struct listening_thread_args));
     args->address = address;
     args->port = port;
