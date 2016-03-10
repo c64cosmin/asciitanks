@@ -77,7 +77,7 @@ void* listening_impl(void* args){
         i=0;
         pthread_mutex_lock(&connection_list_lock);
         //find a empty connection slot
-        while(connections[i]!=0 && i<MAX_CONNECTION_NO){
+        while(connection_alive(connections[i]) && i<MAX_CONNECTION_NO){
             i++;
         }
         //did we find any empty slot?
@@ -90,6 +90,7 @@ void* listening_impl(void* args){
                    ((unsigned char*)&new_addr.sin_addr.s_addr)[3]);
             struct _connection* conn = (struct _connection*) malloc(sizeof(struct _connection));
             conn->socket_fd = newsocketfd;
+            conn->alive = 1;
             connections[i] = (connection)(void*)conn;
             create_messaging_thread(conn);
         }

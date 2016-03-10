@@ -37,6 +37,7 @@ connection new_connection(char* address, int port){
     struct _connection* conn=(struct _connection*)malloc(sizeof(struct _connection));
     //copy the socket descriptor
     conn->socket_fd = socketfd;
+    conn->alive = 1;
     //create a new thread for the connection
     create_messaging_thread(conn);
 
@@ -60,6 +61,16 @@ void create_messaging_thread(struct _connection* conn){
     }
 }
 
+int connection_alive(connection conn){
+    if(conn==0)return 0;
+    struct _connection* c = (struct _connection*)(void*)conn;
+    int status = 0;
+    pthread_mutex_lock(&c->lock);
+    status = c->alive;
+    pthread_mutex_unlock(&c->lock);
+    return status;
+}
+
 void* messaging_thread(void* args){
     struct _connection* arg = (struct _connection*) args;
     int socket_fd = arg->socket_fd;
@@ -71,6 +82,12 @@ void* messaging_thread(void* args){
         char* str = "Le gogosherie";
         int sent = send(socket_fd, (void*)str, strlen(str), 0);
         int recd = recv(socket_fd, (void*)recv_str, 1024, 0);
+        if(recd == 0){
+            connection_open = 0;
+            pthread_mutex_lock(&arg->lock);
+            arg->alive = 0;
+            pthread_mutex_unlock(&arg->lock);
+        }
         printf("Received %i bytes:%s:\n", recd, recv_str);
     }
 }

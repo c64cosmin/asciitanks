@@ -6,6 +6,7 @@
 struct _connection{
     int socket_fd;
     pthread_mutex_t lock;
+    int alive;
 };
 
 void create_messaging_thread(struct _connection* conn);

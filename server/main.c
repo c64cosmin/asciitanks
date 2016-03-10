@@ -18,8 +18,8 @@ int main(int argn, char** argv){
         get_connections(connections);
         int i;
         for(i=0;i<MAX_CONNECTION_NO;i++){
-            if(connections[i]==0)printf("xxx ");
-            else printf("%p ", connections[i]);
+            if(connection_alive(connections[i]))printf("%p ", connections[i]);
+            else printf("xxxxxxxx ");
         }
         printf("\n");
     }
