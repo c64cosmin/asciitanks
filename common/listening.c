@@ -90,7 +90,11 @@ void* listening_impl(void* args){
                    ((unsigned char*)&new_addr.sin_addr.s_addr)[3]);
             struct _connection* conn = (struct _connection*) malloc(sizeof(struct _connection));
             conn->socket_fd = newsocketfd;
+            //initialize the connection
             conn->alive = 1;
+            //fast initialize the buffer
+            conn->recv_buffer[0]=0;
+
             connections[i] = (connection)(void*)conn;
             create_messaging_thread(conn);
         }

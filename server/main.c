@@ -11,6 +11,7 @@ int main(int argn, char** argv){
     int port = atoi(argv[2]);
 
     connection connections[MAX_CONNECTION_NO];
+    char msg[2048];
 
     listening(address, port);
     while(1){
@@ -18,10 +19,12 @@ int main(int argn, char** argv){
         get_connections(connections);
         int i;
         for(i=0;i<MAX_CONNECTION_NO;i++){
-            if(connection_alive(connections[i]))printf("%p ", connections[i]);
-            else printf("xxxxxxxx ");
+            if(connection_alive(connections[i])){
+                recv_string(connections[i], msg);
+                printf("%i:%s\n",i,msg);
+                send_string(connections[i], "jaj");
+            }
         }
-        printf("\n");
     }
     return 0;
 }

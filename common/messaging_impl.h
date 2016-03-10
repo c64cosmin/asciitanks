@@ -2,11 +2,13 @@
 #define _MESSAGING_IMPL_
 
 #include <pthread.h>
+#define SOCK_BUFFER_SIZE 4096
 
 struct _connection{
     int socket_fd;
     pthread_mutex_t lock;
     int alive;
+    char recv_buffer[SOCK_BUFFER_SIZE];
 };
 
 void create_messaging_thread(struct _connection* conn);
