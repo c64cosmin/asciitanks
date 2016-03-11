@@ -9,9 +9,8 @@ int main(int argn, char** argv){
     int i,j;
     for(i=0;i<16;i++)
     for(j=0;j<16;j++)
-    gfx_put(i,j, (i*j)%15+'a', i,j); 
+    gfx_put(i+3,j+3, (i*j)%15+'a', i,j);//BLACK, RED);
     gfx_blit();
-    while(1);
     return 0;
     if(argn != 3){
         printf("Usage: %s ipaddress port\n", argv[0]);
