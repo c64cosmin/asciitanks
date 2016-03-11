@@ -2,8 +2,17 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include "gfx.h"
 
 int main(int argn, char** argv){
+    gfx_init();
+    int i,j;
+    for(i=0;i<16;i++)
+    for(j=0;j<16;j++)
+    gfx_put(i,j, (i*j)%15+'a', i,j); 
+    gfx_blit();
+    while(1);
+    return 0;
     if(argn != 3){
         printf("Usage: %s ipaddress port\n", argv[0]);
         return 1;
