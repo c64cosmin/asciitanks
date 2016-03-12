@@ -12,7 +12,8 @@
 int console_x;
 int console_y;
 char* color_buffer;
-char* gfx_buffer;
+int* gfx_buffer;
+char* gfx_symbols[32];
 
 void gfx_init(){
     struct winsize sz;
@@ -22,13 +23,17 @@ void gfx_init(){
     console_y = sz.ws_row;
     
     color_buffer = (char*)malloc(sizeof(char)*console_x*console_y);
-    gfx_buffer = (char*)malloc(sizeof(char)*console_x*console_y);
+    gfx_buffer = (int*)malloc(sizeof(int)*console_x*console_y);
     if(color_buffer == 0 || gfx_buffer == 0){
         printf("ERROR:Cannot initialize gfx\n");
         console_x=0;
         console_y=0;
     }
     gfx_clear();
+}
+
+void gfx_deinit(){
+    endwin();
 }
 
 void gfx_clear(){
@@ -51,13 +56,21 @@ void gfx_blit(){
             int c = color_buffer[XY(x,y)];
             int bg = (GET_BG(c)&PLAIN_COLOR)+((GET_BG(c)&BRIGHT)==BRIGHT?100:40);
             int fg = (GET_FG(c)&PLAIN_COLOR)+((GET_FG(c)&BRIGHT)==BRIGHT? 90:30);
-            printf("\033[%i;%im%c", fg, bg, gfx_buffer[XY(x,y)]);
+            printf("\033[%i;%im", fg, bg);
+            int s = gfx_buffer[XY(x,y)];
+            if(s>31)printf("%c", s);
+            else printf("%s", gfx_symbols[s]);
         }
     }
 }
 
-void gfx_put(int x, int y, char c, int bg_color, int fg_color){
+void gfx_put(int x, int y, int c, int bg_color, int fg_color){
     if(x<0||x>=console_x||y<0||y>=console_y)return;
     color_buffer[XY(x,y)] = bg_color&0xF | (fg_color&0xF)<<4;
     gfx_buffer[XY(x,y)] = c;
+}
+
+void gfx_set_symbol(int c, char* s){
+    if(c<0||c>31)return;
+    gfx_symbols[c]=s;
 }

@@ -1,4 +1,5 @@
 #include "../common/messaging.h"
+#include "../common/game/map.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,6 +9,11 @@
 int main(int argn, char** argv){
     kbd_init();
     gfx_init();
+    map_draw_init();
+    map game_map = new_map(100,100);
+    map_draw(game_map);
+    gfx_blit();
+    gfx_deinit();
     if(argn != 4){
         printf("Usage: %s ipaddress port\n", argv[0]);
         return 1;
