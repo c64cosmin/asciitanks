@@ -8,24 +8,13 @@
 int main(int argn, char** argv){
     kbd_init();
     gfx_init();
-    int x=0,y=0;
-    while(1){
-        usleep(10000);
-        int key = kbd_get();
-        if(key=='a'||key=='A')x--;
-        if(key=='d'||key=='D')x++;
-        if(key=='w'||key=='W')y--;
-        if(key=='s'||key=='S')y++;
-        if(key!=0)
-        gfx_put(x,y, key, BLACK, RED); 
-        gfx_blit();
-    }
-    if(argn != 3){
+    if(argn != 4){
         printf("Usage: %s ipaddress port\n", argv[0]);
         return 1;
     }
     char* address = argv[1];
     int port = atoi(argv[2]);
+    char* playername = argv[3];
 
     connection c = new_connection(address, port);
     char msg[1024];
