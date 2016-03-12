@@ -51,7 +51,7 @@ void gfx_blit(){
             int c = color_buffer[XY(x,y)];
             int bg = (GET_BG(c)&PLAIN_COLOR)+((GET_BG(c)&BRIGHT)==BRIGHT?100:40);
             int fg = (GET_FG(c)&PLAIN_COLOR)+((GET_FG(c)&BRIGHT)==BRIGHT? 90:30);
-            printf("\033[%i;%im%c", fg, bg, 'x');//gfx_buffer[XY(x,y)]);
+            printf("\033[%i;%im%c", fg, bg, gfx_buffer[XY(x,y)]);
         }
     }
 }

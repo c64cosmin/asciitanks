@@ -1,17 +1,25 @@
 #include "../common/messaging.h"
-#include <stdio.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include "gfx.h"
+#include "kbd.h"
 
 int main(int argn, char** argv){
+    kbd_init();
     gfx_init();
-    int i,j;
-    for(i=0;i<16;i++)
-    for(j=0;j<16;j++)
-    gfx_put(i+3,j+3, (i*j)%15+'a', i,j);//BLACK, RED);
-    gfx_blit();
-    return 0;
+    int x=0,y=0;
+    while(1){
+        usleep(10000);
+        int key = kbd_get();
+        if(key=='a'||key=='A')x--;
+        if(key=='d'||key=='D')x++;
+        if(key=='w'||key=='W')y--;
+        if(key=='s'||key=='S')y++;
+        if(key!=0)
+        gfx_put(x,y, key, BLACK, RED); 
+        gfx_blit();
+    }
     if(argn != 3){
         printf("Usage: %s ipaddress port\n", argv[0]);
         return 1;
