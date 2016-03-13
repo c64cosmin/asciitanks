@@ -42,7 +42,7 @@ void gfx_clear(){
     int y;
     for(x=0;x<console_x;x++)
     for(y=0;y<console_y;y++){
-        color_buffer[XY(x,y)]=BLACK;
+        color_buffer[XY(x,y)]=(RED|GREEN|BLUE)<<4;
         gfx_buffer[XY(x,y)]=' ';
     }
 }

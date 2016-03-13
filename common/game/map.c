@@ -6,6 +6,7 @@ map new_map(int x, int y){
     m.map_data = (char*)malloc(sizeof(char)*x*y);
     m.map_x = x;
     m.map_y = y;
+    return m;
 }
 
 char get_map(map m, int x, int y){

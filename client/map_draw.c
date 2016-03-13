@@ -1,3 +1,4 @@
+#include <math.h>
 #include "map_draw.h"
 #include "gfx.h"
 
@@ -8,6 +9,12 @@ char* grass_sprite[5];
 int dirt_symbol[3];
 int stone_symbol[4];
 int grass_symbol[5];
+
+int random(int x, int d){
+    double r = cos((double)x*125.984d+616.414d)*568.486d + cos((double)x*483.165d+448.168d)*468.168d;
+    r = r - floor(r);
+    return (int)floor(r*d);
+}
 
 void map_draw_init(){
     dirt_sprite[0] = " ";
@@ -43,6 +50,26 @@ void map_draw_init(){
 void map_draw(map m, int camera_x, int camera_y){
     int x,y;
     for(x=0;x<100;x++)
-    for(y=0;y<70;y++)
-        gfx_put(x,y,(x+y)%3+0,GREEN,GREEN|BRIGHT);
+    for(y=0;y<50;y++){
+        char cell = get_map(m, x, y);
+        int put = ' ';
+        int bg = BLACK;
+        int fg = RED|GREEN|BLUE;
+        if(cell == MAP_DIRT){
+            put = dirt_symbol[random(x+y*m.map_x, 3)];
+            bg = RED;
+            fg = BLACK;
+        }
+        if(cell == MAP_STONE){
+            put = stone_symbol[random(x+y*m.map_x, 4)];
+            bg = RED|GREEN|BLUE;
+            fg = BLACK|BRIGHT;
+        }
+        if(cell == MAP_GRASS){
+            put = grass_symbol[random(x+y*m.map_x, 5)];
+            bg = GREEN;
+            fg = GREEN|BRIGHT;
+        }
+        gfx_put(x, y, put, bg, fg);
+    }
 }

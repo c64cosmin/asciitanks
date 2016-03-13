@@ -26,6 +26,7 @@ set(CLIENT_SOURCES ${CLIENT_SOURCES} client/main.c)
 set(LIBS)
 set(LIBS ${LIBS} "pthread")
 set(LIBS ${LIBS} "ncurses")
+set(LIBS ${LIBS} "m")
 add_executable (AsciiTanks ${CLIENT_SOURCES})
 
 target_link_libraries (AsciiTanks ${LIBS}) 
