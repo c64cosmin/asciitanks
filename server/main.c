@@ -1,4 +1,5 @@
 #include "../common/listening.h"
+#include "../common/game/map.h"
 #include <stdio.h>
 #include <unistd.h>
 
@@ -13,9 +14,11 @@ int main(int argn, char** argv){
     connection connections[MAX_CONNECTION_NO];
     char msg[2048];
 
+    map game_map = new_map(200,2800);
+
     listening(address, port);
     while(1){
-        usleep(1000000);
+        usleep(100);
         get_connections(connections);
         int i;
         for(i=0;i<MAX_CONNECTION_NO;i++){
