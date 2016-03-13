@@ -48,6 +48,7 @@ void map_draw_init(){
 }
 
 void map_draw(map m, int camera_x, int camera_y){
+    if(m.map_data == 0)return;
     int x,y;
     for(x=0;x<MAP_SCREEN_X;x++)
     for(y=0;y<MAP_SCREEN_Y;y++){

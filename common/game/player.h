@@ -12,7 +12,7 @@ typedef struct _player{
     int pos_y;
     int direction;
     bullet bullet[3];
-    int bullet_no
+    int bullet_no;
 } player;
 
 #endif //_PLAYER_H_

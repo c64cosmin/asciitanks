@@ -33,8 +33,8 @@ void gfx_init(){
 }
 
 void gfx_deinit(){
-    printf("\033[0;0H");
     endwin();
+    printf("\033[0;0H");
 }
 
 void gfx_clear(){

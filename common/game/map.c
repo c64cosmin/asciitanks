@@ -6,6 +6,15 @@ map new_map(int x, int y){
     m.map_data = (char*)malloc(sizeof(char)*x*y);
     m.map_x = x;
     m.map_y = y;
+    if(m.map_data == 0){
+        m.map_x = 0;
+        m.map_y = 0;
+        return m;
+    }
+    int xi,yi;
+    for(xi=0;xi<m.map_x;xi++)
+    for(yi=0;yi<m.map_y;yi++)
+        m.map_data[xi+yi*m.map_x] = 0;
     return m;
 }
 

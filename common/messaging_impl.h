@@ -8,7 +8,8 @@ struct _connection{
     int socket_fd;
     pthread_mutex_t lock;
     int alive;
-    char recv_buffer[SOCK_BUFFER_SIZE];
+    unsigned char recv_buffer[SOCK_BUFFER_SIZE];
+    char recv_buffer_len;
 };
 
 void create_messaging_thread(struct _connection* conn);

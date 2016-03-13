@@ -4,6 +4,7 @@ project (AsciiTanksServer C)
 set(SERVER_SOURCES)
 set(SERVER_SOURCES ${SERVER_SOURCES} common/listening.c)
 set(SERVER_SOURCES ${SERVER_SOURCES} common/messaging.c)
+set(SERVER_SOURCES ${SERVER_SOURCES} common/game/map.c)
 set(SERVER_SOURCES ${SERVER_SOURCES} server/main.c)
 
 set(LIBS)

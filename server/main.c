@@ -16,15 +16,24 @@ int main(int argn, char** argv){
     int port = atoi(argv[2]);
 
     connection connections[MAX_CONNECTION_NO];
-    char msg[2048];
+    unsigned char msg[256];
 
     map game_map = new_map(400,300);
+    int x,y;
+    for(x=0;x<30;x++)
+    for(y=0;y<30;y++){
+        set_map(game_map, x,y, MAP_GRASS);
+        set_map(game_map, x+30,y, MAP_STONE);
+        set_map(game_map, x+30,y+30, MAP_DIRT);
+        set_map(game_map, x,y+30, (x*y)%4);
+    }
 
     player players[MAX_CONNECTION_NO];
     client_state clients[MAX_CONNECTION_NO];
 
     listening(address, port);
     while(1){
+        usleep(10);
         get_connections(connections);
         int i;
         for(i=0;i<MAX_CONNECTION_NO;i++)
@@ -37,12 +46,13 @@ void update_player(int i, map m, connection conn, client_state* state, player* p
     if(connection_alive(conn)){
         if(state->connection_state == 0){
             state->connection_state = 1;
-            state->map_state = 0;
+            state->map_progress = 0;
             return;
         }
         else{
             if(state->map_progress == 0){
                 state->map_progress = 1;
+                state->map_state = 0;
                 state->map_progress_x = 0;
                 state->map_progress_y = 0;
                 //1 header + 2sizex + 2sizey + 1 zero terminated
@@ -58,11 +68,11 @@ void update_player(int i, map m, connection conn, client_state* state, player* p
 
                 map_buffer[3] = sy&0xFF;
                 map_buffer[4] = (sy>>8)&0xFF;
-                send_string(conn, map_buffer);
+                send_string(conn, map_buffer, 6);
                 return;
             }
             else{
-                if(state->map_state == 0{
+                if(state->map_state == 0){
                     if(state->map_progress_y >= m.map_y){
                         state->map_state = 1;
                         return;
@@ -87,7 +97,7 @@ void update_player(int i, map m, connection conn, client_state* state, player* p
                         map_buffer[x+y*8+5] = get_map(m, x + sx, y + sy);
                     }
 
-                    send_string(conn, map_buffer);
+                    send_string(conn, map_buffer, 70);
                     state->map_progress_x += 8;
                     if(state->map_progress_x >= m.map_x){
                         state->map_progress_x = 0;
@@ -98,6 +108,7 @@ void update_player(int i, map m, connection conn, client_state* state, player* p
                 else{
                     //done, can do game logic
                 }
+            }
         }
     }
     else{
