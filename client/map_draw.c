@@ -49,8 +49,8 @@ void map_draw_init(){
 
 void map_draw(map m, int camera_x, int camera_y){
     int x,y;
-    for(x=0;x<100;x++)
-    for(y=0;y<50;y++){
+    for(x=0;x<MAP_SCREEN_X;x++)
+    for(y=0;y<MAP_SCREEN_Y;y++){
         char cell = get_map(m, x + camera_x, y + camera_y);
         int put = ' ';
         int bg = BLACK;
