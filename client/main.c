@@ -11,8 +11,9 @@ int main(int argn, char** argv){
     gfx_init();
     gfx_clear();
     map_draw_init();
+    int x = 0;
+    int y = 0;
     map game_map = new_map(100,100);
-    
     int i,j;
     for(i=0;i<50;i++)
     for(j=0;j<50;j++){
@@ -20,11 +21,25 @@ int main(int argn, char** argv){
         set_map(game_map, i+50,j, MAP_STONE);
         set_map(game_map, i,j+50, MAP_DIRT);
     }
-    
-    map_draw(game_map);
+    int running = 1;
+    while(running){
+        int key = kbd_get();
+        if(key == KBD_ESC)running = 0;
+        if(key == 'a')x--;
+        if(key == 'd')x++;
+        if(key == 'w')y--;
+        if(key == 's')y++;
+
+        map_draw(game_map, x, y);
+        gfx_blit();
+    }
+    gfx_clear();
     gfx_blit();
     gfx_deinit();
-    while(1);
+    return 0;
+
+
+
     if(argn != 4){
         printf("Usage: %s ipaddress port\n", argv[0]);
         return 1;

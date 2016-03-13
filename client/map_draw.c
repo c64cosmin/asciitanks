@@ -51,22 +51,23 @@ void map_draw(map m, int camera_x, int camera_y){
     int x,y;
     for(x=0;x<100;x++)
     for(y=0;y<50;y++){
-        char cell = get_map(m, x, y);
+        char cell = get_map(m, x + camera_x, y + camera_y);
         int put = ' ';
         int bg = BLACK;
         int fg = RED|GREEN|BLUE;
+        int seed = (x + camera_x)+(y + camera_y)*m.map_x;
         if(cell == MAP_DIRT){
-            put = dirt_symbol[random(x+y*m.map_x, 3)];
+            put = dirt_symbol[random(seed, 3)];
             bg = RED;
             fg = BLACK;
         }
         if(cell == MAP_STONE){
-            put = stone_symbol[random(x+y*m.map_x, 4)];
+            put = stone_symbol[random(seed, 4)];
             bg = RED|GREEN|BLUE;
             fg = BLACK|BRIGHT;
         }
         if(cell == MAP_GRASS){
-            put = grass_symbol[random(x+y*m.map_x, 5)];
+            put = grass_symbol[random(seed, 5)];
             bg = GREEN;
             fg = GREEN|BRIGHT;
         }
