@@ -6,6 +6,8 @@
 #include "../common/game/player.h"
 #include "client_state.h"
 
+#define CHUNK_SIZE 60
+
 void update_player(int i, map m, connection conn, client_state* state, player* p);
 void init_map(map m);
 void get_spawn_point(map m, int i, int* x,int* y);
@@ -19,7 +21,6 @@ int main(int argn, char** argv){
     int port = atoi(argv[2]);
 
     connection connections[MAX_CONNECTION_NO];
-    unsigned char msg[256];
 
     map game_map = new_map(600,600);
     init_map(game_map);
@@ -29,7 +30,7 @@ int main(int argn, char** argv){
 
     listening(address, port);
     while(1){
-        usleep(10);
+        usleep(5000);
         get_connections(connections);
         int i;
         for(i=0;i<MAX_CONNECTION_NO;i++)
@@ -73,9 +74,10 @@ void update_player(int i, map m, connection conn, client_state* state, player* p
                         state->map_state = 1;
                         return;
                     }
-                    //1 header + 2posx + 2posy + 8*8 + 1 zero terminated
-                    char map_buffer[70];
-                    map_buffer[69] = 0;
+                    //60*60 = 3600
+                    //1 header + 2posx + 2posy + 3600 + 1 zero terminated
+                    char map_buffer[3606];
+                    map_buffer[3605] = 0;
                     map_buffer[0] = 1;//sending map chunk
 
                     int x,y;
@@ -88,16 +90,17 @@ void update_player(int i, map m, connection conn, client_state* state, player* p
                     map_buffer[3] = sy&0xFF;
                     map_buffer[4] = (sy>>8)&0xFF;
 
-                    for(x=0;x<8;x++)
-                    for(y=0;y<8;y++){
-                        map_buffer[x+y*8+5] = get_map(m, x + sx, y + sy);
+                    for(x=0;x<CHUNK_SIZE;x++)
+                    for(y=0;y<CHUNK_SIZE;y++){
+                        map_buffer[x+y*CHUNK_SIZE+5] = get_map(m, x + sx, y + sy);
                     }
 
-                    send_string(conn, map_buffer, 70);
-                    state->map_progress_x += 8;
+                    send_string(conn, map_buffer, 3606);
+
+                    state->map_progress_x += CHUNK_SIZE;
                     if(state->map_progress_x >= m.map_x){
                         state->map_progress_x = 0;
-                        state->map_progress_y += 8;
+                        state->map_progress_y += CHUNK_SIZE;
                     }
                     return;
                 }
@@ -186,7 +189,7 @@ int spawn_gen(map m,int x_pos, int y_pos){
         int x,y;
         get_spawn_point(m, i, &x, &y);
         int d = (int)sqrt((x_pos-x)*(x_pos-x)+(y_pos-y)*(y_pos-y));
-        if(d<10)return 1;
+        if(d<12)return 1;
     }
     return 0;
 }

@@ -7,6 +7,8 @@
 #include "gfx.h"
 #include "kbd.h"
 
+#define CHUNK_SIZE 60
+
 void update_player(map* m, connection conn, player* p);
 
 int main(int argn, char** argv){
@@ -33,7 +35,6 @@ int main(int argn, char** argv){
     int xc=0,yc=0;
 
     while(connection_alive(c) && running){
-        usleep(1000);
         update_player(&game_map, c, &p); 
         char key = kbd_get();
         if(key == KBD_ESC)running = 0;
@@ -53,7 +54,7 @@ int main(int argn, char** argv){
 }
 
 void update_player(map* m, connection conn, player* p){
-    unsigned char msg[256];
+    unsigned char msg[4096];
     int msg_len;
     recv_string(conn, msg, &msg_len);
     if(msg_len==0)return;
@@ -68,9 +69,9 @@ void update_player(map* m, connection conn, player* p){
         int pos_y = msg[3]|(msg[4]<<8);
         
         int x,y;
-        for(x=0;x<8;x++)
-        for(y=0;y<8;y++)
-            set_map(*m, x + pos_x, y + pos_y, msg[x+y*8+5]);
+        for(x=0;x<CHUNK_SIZE;x++)
+        for(y=0;y<CHUNK_SIZE;y++)
+            set_map(*m, x + pos_x, y + pos_y, msg[x+y*CHUNK_SIZE+5]);
     }
     
 }
