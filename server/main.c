@@ -189,7 +189,7 @@ int spawn_gen(map m,int x_pos, int y_pos){
         int x,y;
         get_spawn_point(m, i, &x, &y);
         int d = (int)sqrt((x_pos-x)*(x_pos-x)+(y_pos-y)*(y_pos-y));
-        if(d<12)return 1;
+        if(d<13)return 1;
     }
     return 0;
 }

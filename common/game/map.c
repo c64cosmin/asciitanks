@@ -19,8 +19,8 @@ map new_map(int x, int y){
 }
 
 char get_map(map m, int x, int y){
-    if(m.map_data==0)return 0;
-    if(x<0||x>=m.map_x||y<0||y>=m.map_y)return 0;
+    if(m.map_data==0)return MAP_STONE;
+    if(x<0||x>=m.map_x||y<0||y>=m.map_y)return MAP_STONE;
     return m.map_data[x+y*m.map_x];
 }
 
