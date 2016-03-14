@@ -8,6 +8,7 @@
 
 void update_player(int i, map m, connection conn, client_state* state, player* p);
 void init_map(map m);
+void get_spawn_point(map m, int i, int* x,int* y);
 
 int main(int argn, char** argv){
     if(argn != 3){
@@ -20,7 +21,7 @@ int main(int argn, char** argv){
     connection connections[MAX_CONNECTION_NO];
     unsigned char msg[256];
 
-    map game_map = new_map(400,300);
+    map game_map = new_map(600,600);
     init_map(game_map);
 
     player players[MAX_CONNECTION_NO];
@@ -143,6 +144,53 @@ int grass_gen(int x_pos, int y_pos){
     return 0;
 }
 
+void get_spawn_point(map m, int i, int* x, int* y){
+    int margin=30;
+    if(i == 0){
+        *x = margin;
+        *y = m.map_y/2;
+    }
+    if(i == 1){
+        *x = m.map_x-margin;
+        *y = m.map_y/2;
+    }
+    if(i == 2){
+        *x = m.map_x/2;
+        *y = margin;
+    }
+    if(i == 3){
+        *x = m.map_x/2;
+        *y = m.map_y-margin;
+    }
+    if(i == 4){
+        *x = margin;
+        *y = margin;
+    }
+    if(i == 5){
+        *x = m.map_x-margin;
+        *y = m.map_y-margin;
+    }
+    if(i == 6){
+        *x = m.map_x-margin;
+        *y = margin;
+    }
+    if(i == 7){
+        *x = margin;
+        *y = m.map_y-margin;
+    }
+}
+
+int spawn_gen(map m,int x_pos, int y_pos){
+    int i;
+    for(i=0;i<8;i++){
+        int x,y;
+        get_spawn_point(m, i, &x, &y);
+        int d = (int)sqrt((x_pos-x)*(x_pos-x)+(y_pos-y)*(y_pos-y));
+        if(d<10)return 1;
+    }
+    return 0;
+}
+
 void init_map(map m){
     int x,y;
     for(x=0;x<m.map_x;x++)
@@ -150,6 +198,7 @@ void init_map(map m){
         int set = MAP_DIRT;
         if(stone_gen(x,y))set = MAP_STONE;
         if(grass_gen(x,y))set = MAP_GRASS;
+        if(spawn_gen(m,x,y))set = MAP_EMPTY;
         set_map(m,x,y,set);
     }
 }

@@ -47,7 +47,7 @@ int main(int argn, char** argv){
     gfx_clear();
     gfx_blit();
     gfx_deinit();
-    if(!running)
+    if(running)
         printf("Server stopped\n");
     return 0;
 }
