@@ -7,11 +7,12 @@ set(SERVER_SOURCES ${SERVER_SOURCES} common/messaging.c)
 set(SERVER_SOURCES ${SERVER_SOURCES} common/game/map.c)
 set(SERVER_SOURCES ${SERVER_SOURCES} server/main.c)
 
-set(LIBS)
-set(LIBS ${LIBS} "pthread")
+set(SERVER_LIBS)
+set(SERVER_LIBS ${SERVER_LIBS} "pthread")
+set(SERVER_LIBS ${SERVER_LIBS} "m")
 add_executable (AsciiTanksServer ${SERVER_SOURCES})
 
-target_link_libraries (AsciiTanksServer ${LIBS}) 
+target_link_libraries (AsciiTanksServer ${SERVER_LIBS}) 
 
 
 
@@ -24,10 +25,10 @@ set(CLIENT_SOURCES ${CLIENT_SOURCES} client/kbd.c)
 set(CLIENT_SOURCES ${CLIENT_SOURCES} client/map_draw.c)
 set(CLIENT_SOURCES ${CLIENT_SOURCES} client/main.c)
 
-set(LIBS)
-set(LIBS ${LIBS} "pthread")
-set(LIBS ${LIBS} "ncurses")
-set(LIBS ${LIBS} "m")
+set(CLIENT_LIBS)
+set(CLIENT_LIBS ${CLIENT_LIBS} "pthread")
+set(CLIENT_LIBS ${CLIENT_LIBS} "ncurses")
+set(CLIENT_LIBS ${CLIENT_LIBS} "m")
 add_executable (AsciiTanks ${CLIENT_SOURCES})
 
-target_link_libraries (AsciiTanks ${LIBS}) 
+target_link_libraries (AsciiTanks ${CLIENT_LIBS}) 

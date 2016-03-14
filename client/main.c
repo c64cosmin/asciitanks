@@ -30,12 +30,18 @@ int main(int argn, char** argv){
     player p;
     game_map.map_data = 0;
 
+    int xc=0,yc=0;
+
     while(connection_alive(c) && running){
         usleep(1000);
         update_player(&game_map, c, &p); 
         char key = kbd_get();
         if(key == KBD_ESC)running = 0;
-        map_draw(game_map, 0, 0);
+        if(key == 'a')xc--;
+        if(key == 'd')xc++;
+        if(key == 'w')yc--;
+        if(key == 's')yc++;
+        map_draw(game_map, xc, yc);
         gfx_blit();
     }
     gfx_clear();

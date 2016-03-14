@@ -1,11 +1,13 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <math.h>
 #include "../common/listening.h"
 #include "../common/game/map.h"
 #include "../common/game/player.h"
 #include "client_state.h"
-#include <stdio.h>
-#include <unistd.h>
 
 void update_player(int i, map m, connection conn, client_state* state, player* p);
+void init_map(map m);
 
 int main(int argn, char** argv){
     if(argn != 3){
@@ -19,14 +21,7 @@ int main(int argn, char** argv){
     unsigned char msg[256];
 
     map game_map = new_map(400,300);
-    int x,y;
-    for(x=0;x<30;x++)
-    for(y=0;y<30;y++){
-        set_map(game_map, x,y, MAP_GRASS);
-        set_map(game_map, x+30,y, MAP_STONE);
-        set_map(game_map, x+30,y+30, MAP_DIRT);
-        set_map(game_map, x,y+30, (x*y)%4);
-    }
+    init_map(game_map);
 
     player players[MAX_CONNECTION_NO];
     client_state clients[MAX_CONNECTION_NO];
@@ -113,5 +108,48 @@ void update_player(int i, map m, connection conn, client_state* state, player* p
     }
     else{
         state->connection_state = 0;
+    }
+}
+
+int stone_gen(int x_pos, int y_pos){
+    double x=x_pos*0.2;
+    double y=y_pos*0.2;
+    double res=0;
+    res += cos(x* 0.365+y* 0.484);
+    res += cos(x* 0.257+y* 0.123);
+    res += cos(x*-0.245+y* 0.285);
+    res += cos(x*-0.524+y* 0.721);
+    res += cos(x* 0.437+y*-0.752);
+    res += cos(x* 0.135+y*-0.286);
+    res += cos(x*-0.834+y*-0.632);
+    res += cos(x*-0.372+y*-0.126);
+    if(res>3.0)return 1;
+    return 0;
+}
+
+int grass_gen(int x_pos, int y_pos){
+    double x=x_pos*0.3;
+    double y=y_pos*0.3;
+    double res=0;
+    res += cos(x* 0.372+y* 0.158);
+    res += cos(x* 0.346+y* 0.821);
+    res += cos(x*-0.247+y* 0.466);
+    res += cos(x*-0.732+y* 0.157);
+    res += cos(x* 0.259+y*-0.168);
+    res += cos(x* 0.825+y*-0.189);
+    res += cos(x*-0.486+y*-0.822);
+    res += cos(x*-0.159+y*-0.168);
+    if(res>3.8)return 1;
+    return 0;
+}
+
+void init_map(map m){
+    int x,y;
+    for(x=0;x<m.map_x;x++)
+    for(y=0;y<m.map_y;y++){
+        int set = MAP_DIRT;
+        if(stone_gen(x,y))set = MAP_STONE;
+        if(grass_gen(x,y))set = MAP_GRASS;
+        set_map(m,x,y,set);
     }
 }
