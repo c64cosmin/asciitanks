@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../common/messaging.h"
 #include "../common/game/map.h"
 #include "../common/game/player.h"
@@ -31,14 +32,11 @@ int main(int argn, char** argv){
     map game_map;
     //init players
     int my_id=-1;
-    player* players = (player*)malloc(sizeof(player)*8);
+    player players[8];
     int i;
     for(i=0;i<8;i++){
         players[i].id = i;
-        players[i].pos_x = i*10;
-        players[i].pos_y = i*3;
-        players[i].direction = i%4;
-        players[i].online=1;
+        players[i].online=0;
     }
     game_map.map_data = 0;
 
@@ -52,8 +50,6 @@ int main(int argn, char** argv){
         if(key == 'd')xc++;
         if(key == 'w')yc--;
         if(key == 's')yc++;
-        players[3].pos_x=xc;
-        players[3].pos_y=yc;
         if(my_id!=-1)
             map_draw(game_map, players, my_id);
         gfx_blit();
@@ -89,5 +85,7 @@ void update_player(map* m, connection conn, player* p, int* id){
     if(msg[0] == 2){//receive my id
         *id = msg[1];
     }
-    
+    if(msg[0] == 3){//receive game state
+        memcpy((void*)p, (void*)&msg[1], sizeof(player)*8);
+    }
 }

@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <math.h>
 #include "../common/listening.h"
@@ -11,6 +13,7 @@
 void update_player(int i, map m, connection conn, client_state* state, player* p);
 void init_map(map m);
 void get_spawn_point(map m, int i, int* x,int* y);
+void game_logic(int i, map m, player* p, connection conn);
 
 int main(int argn, char** argv){
     if(argn != 3){
@@ -28,13 +31,19 @@ int main(int argn, char** argv){
     player players[MAX_CONNECTION_NO];
     client_state clients[MAX_CONNECTION_NO];
 
+    //init players
+    int i;
+    for(i=0;i<8;i++){
+        players[i].id = i;
+        players[i].online = 0;
+    }
+
     listening(address, port);
     while(1){
         usleep(5000);
         get_connections(connections);
-        int i;
         for(i=0;i<MAX_CONNECTION_NO;i++)
-            update_player(i, game_map, connections[i], &clients[i], &players[i]);
+            update_player(i, game_map, connections[i], &clients[i], players);
     }
     return 0;
 }
@@ -114,9 +123,16 @@ void update_player(int i, map m, connection conn, client_state* state, player* p
                         buffer[1] = i;
                         buffer[2] = 0;
                         send_string(conn, buffer, 3);
+
+                        //init player state
+                        p[i].id = i;
+                        p[i].online = 1;
+                        get_spawn_point(m, i, &p[i].pos_x, &p[i].pos_y);
+                        p[i].direction = 0;
+                        p[i].bullet_is=0;
                     }
                     else{
-                        //done, can do game logic
+                        game_logic(i, m, p, conn);
                     }
                 }
             }
@@ -216,4 +232,13 @@ void init_map(map m){
         if(spawn_gen(m,x,y))set = MAP_EMPTY;
         set_map(m,x,y,set);
     }
+}
+
+void game_logic(int i, map m, player* p, connection conn){
+    //sizeof(player)*8 = 36 * 8 = 288
+    char state_buffer[289];
+    state_buffer[0] = 3;//send game state
+    int it;
+    memcpy((void*)&state_buffer[1], (void*)p, sizeof(player)*8); 
+    send_string(conn, state_buffer, 289);
 }
