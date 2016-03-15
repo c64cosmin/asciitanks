@@ -9,7 +9,7 @@
 
 #define CHUNK_SIZE 60
 
-void update_player(map* m, connection conn, player* p);
+void update_player(map* m, connection conn, player* p, int* id);
 
 int main(int argn, char** argv){
     if(argn != 4){
@@ -30,6 +30,7 @@ int main(int argn, char** argv){
     char running = 1;
     map game_map;
     //init players
+    int my_id=-1;
     player* players = (player*)malloc(sizeof(player)*8);
     int i;
     for(i=0;i<8;i++){
@@ -37,13 +38,14 @@ int main(int argn, char** argv){
         players[i].pos_x = i*10;
         players[i].pos_y = i*3;
         players[i].direction = i%4;
+        players[i].online=1;
     }
     game_map.map_data = 0;
 
     int xc=0,yc=0;
 
     while(connection_alive(c) && running){
-        update_player(&game_map, c, players); 
+        update_player(&game_map, c, players, &my_id); 
         char key = kbd_get();
         if(key == KBD_ESC)running = 0;
         if(key == 'a')xc--;
@@ -52,7 +54,8 @@ int main(int argn, char** argv){
         if(key == 's')yc++;
         players[3].pos_x=xc;
         players[3].pos_y=yc;
-        map_draw(game_map, players, 3);
+        if(my_id!=-1)
+            map_draw(game_map, players, my_id);
         gfx_blit();
     }
     gfx_clear();
@@ -63,7 +66,7 @@ int main(int argn, char** argv){
     return 0;
 }
 
-void update_player(map* m, connection conn, player* p){
+void update_player(map* m, connection conn, player* p, int* id){
     unsigned char msg[4096];
     int msg_len;
     recv_string(conn, msg, &msg_len);
@@ -82,6 +85,9 @@ void update_player(map* m, connection conn, player* p){
         for(x=0;x<CHUNK_SIZE;x++)
         for(y=0;y<CHUNK_SIZE;y++)
             set_map(*m, x + pos_x, y + pos_y, msg[x+y*CHUNK_SIZE+5]);
+    }
+    if(msg[0] == 2){//receive my id
+        *id = msg[1];
     }
     
 }

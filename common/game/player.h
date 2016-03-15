@@ -3,6 +3,7 @@
 
 typedef struct _player{
     char id;
+    char online;
     char name[10];
     int pos_x;
     int pos_y;

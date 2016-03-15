@@ -165,7 +165,7 @@ void map_draw(map m, player* players, int id){
 
             int tank_x = mapx - player_x + 3;
             int tank_y = mapy - player_y + 3;
-            if(tank_x>=0&&tank_y>=0&&tank_x<7&&tank_y<7){
+            if(tank_x>=0&&tank_y>=0&&tank_x<7&&tank_y<7&&players[i].online){
                 char** tank_ch;
                 char** tank_fg;
                 char** tank_bg;

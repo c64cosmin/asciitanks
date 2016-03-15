@@ -7,6 +7,7 @@ typedef struct _client_state{
     int map_progress;
     int map_progress_x;
     int map_progress_y;
+    int id_state;
 } client_state;
 
 #endif //_CLIENT_STATE_H_

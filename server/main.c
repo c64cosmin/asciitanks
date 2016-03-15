@@ -50,6 +50,7 @@ void update_player(int i, map m, connection conn, client_state* state, player* p
             if(state->map_progress == 0){
                 state->map_progress = 1;
                 state->map_state = 0;
+                state->id_state = 0;
                 state->map_progress_x = 0;
                 state->map_progress_y = 0;
                 //1 header + 2sizex + 2sizey + 1 zero terminated
@@ -105,7 +106,18 @@ void update_player(int i, map m, connection conn, client_state* state, player* p
                     return;
                 }
                 else{
-                    //done, can do game logic
+                    if(state->id_state == 0){
+                        state->id_state = 1;
+
+                        char buffer[3];
+                        buffer[0] = 2;//sending player id
+                        buffer[1] = i;
+                        buffer[2] = 0;
+                        send_string(conn, buffer, 3);
+                    }
+                    else{
+                        //done, can do game logic
+                    }
                 }
             }
         }
