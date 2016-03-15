@@ -244,6 +244,21 @@ void game_logic(int i, map m, player* p, connection conn){
         if(msg[0] == 0){//receive player name
             memcpy(p[i].name, &msg[1], 10);
         }
+        if(msg[0] == 1){//receive player key press
+            char key = msg[1];
+            if(msg[1] == 'w'){
+                p[i].pos_y--;
+            }
+            if(msg[1] == 's'){
+                p[i].pos_y++;
+            }
+            if(msg[1] == 'a'){
+                p[i].pos_x--;
+            }
+            if(msg[1] == 'd'){
+                p[i].pos_x++;
+            }
+        }
     }
     //sizeof(player)*8 = 36 * 8 = 288
     char state_buffer[289];

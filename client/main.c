@@ -52,10 +52,12 @@ int main(int argn, char** argv){
         update_player(&game_map, c, players, &my_id); 
         char key = kbd_get();
         if(key == KBD_ESC)running = 0;
-        if(key == 'a')xc--;
-        if(key == 'd')xc++;
-        if(key == 'w')yc--;
-        if(key == 's')yc++;
+        if(key == 'a' || key == 'd' || key == 'w' || key == 's' || key == ' '){
+            char buffer[2];
+            buffer[0] = 1;//send key
+            buffer[1] = key;
+            send_string(c, buffer, 2);
+        }
         if(my_id!=-1){
             if(sent_name == 0){
                 sent_name = 1;
