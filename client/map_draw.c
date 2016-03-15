@@ -34,6 +34,18 @@ int random(int x, int d){
     return (int)floor(r*d);
 }
 
+int get_player_color(int player){
+     if(player == 0)return RED|BRIGHT;
+     if(player == 1)return BLUE|BRIGHT;
+     if(player == 2)return GREEN|BRIGHT;
+     if(player == 3)return RED|GREEN|BRIGHT;
+     if(player == 4)return BLUE|GREEN|BRIGHT;
+     if(player == 5)return RED|BLUE|BRIGHT;
+     if(player == 6)return RED|GREEN|BLUE|BRIGHT;
+     if(player == 7)return RED|GREEN;
+     return 0;
+}
+
 void map_draw_init(){
     dirt_sprite[0] = " ";
     dirt_sprite[1] = "\u2591";
@@ -170,17 +182,7 @@ void map_draw(map m, player* players, int id){
                 char** tank_fg;
                 char** tank_bg;
                 int dir = players[i].direction;
-                int player = players[i].id;
-                int decal = 0;
-
-                if(player == 0)decal = RED|BRIGHT;
-                if(player == 1)decal = BLUE|BRIGHT;
-                if(player == 2)decal = GREEN|BRIGHT;
-                if(player == 3)decal = RED|GREEN|BRIGHT;
-                if(player == 4)decal = BLUE|GREEN|BRIGHT;
-                if(player == 5)decal = RED|BLUE|BRIGHT;
-                if(player == 6)decal = RED|GREEN|BLUE|BRIGHT;
-                if(player == 7)decal = RED|GREEN;
+                int decal = get_player_color(players[i].id);
 
                 if(dir == 0){
                     tank_ch = tank_ch_u;
@@ -227,5 +229,21 @@ void map_draw(map m, player* players, int id){
             fg = GREEN|BRIGHT;
         }
         gfx_put(x, y, put, bg, fg);
+    }
+    int player_pos = 0;
+    for(i=0;i<8;i++){
+        if(players[i].online){
+            int pcolor = get_player_color(players[i].id);
+            for(x=0;x<10;x++){
+                gfx_put(MAP_SCREEN_X + 2 + x, 1+player_pos*2, players[i].name[x], BLACK, pcolor);
+            }
+            player_pos++;
+        }
+    }
+    while(player_pos<8){
+        for(x=0;x<10;x++){
+            gfx_put(MAP_SCREEN_X + 2 + x, 1+player_pos*2, ' ', BLACK, BLACK);
+        }
+        player_pos++;
     }
 }

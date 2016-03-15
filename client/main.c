@@ -12,6 +12,9 @@
 
 void update_player(map* m, connection conn, player* p, int* id);
 
+unsigned char msg[4096];
+int msg_len;
+
 int main(int argn, char** argv){
     if(argn != 4){
         printf("Usage: %s ipaddress port playername\n", argv[0]);
@@ -26,9 +29,12 @@ int main(int argn, char** argv){
     char* address = argv[1];
     int port = atoi(argv[2]);
     char* playername = argv[3];
+    if(strlen(playername)>10)
+        playername[10]=0;
 
     connection c = new_connection(address, port);
     char running = 1;
+    char sent_name = 0;
     map game_map;
     //init players
     int my_id=-1;
@@ -50,8 +56,19 @@ int main(int argn, char** argv){
         if(key == 'd')xc++;
         if(key == 'w')yc--;
         if(key == 's')yc++;
-        if(my_id!=-1)
+        if(my_id!=-1){
+            if(sent_name == 0){
+                sent_name = 1;
+                char buffer[11];
+                buffer[0] = 0;//send my name
+                int j;
+                for(j=0;j<10;j++)
+                    buffer[j+1] = ' ';
+                strcpy(&buffer[1], playername);
+                send_string(c, buffer, 11);
+            }
             map_draw(game_map, players, my_id);
+        }
         gfx_blit();
     }
     gfx_clear();
@@ -63,8 +80,6 @@ int main(int argn, char** argv){
 }
 
 void update_player(map* m, connection conn, player* p, int* id){
-    unsigned char msg[4096];
-    int msg_len;
     recv_string(conn, msg, &msg_len);
     if(msg_len==0)return;
     if(msg[0] == 0){//receive map size

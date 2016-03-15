@@ -15,6 +15,9 @@ void init_map(map m);
 void get_spawn_point(map m, int i, int* x,int* y);
 void game_logic(int i, map m, player* p, connection conn);
 
+unsigned char msg[4096];
+int msg_len;
+
 int main(int argn, char** argv){
     if(argn != 3){
         printf("Usage: %s ipaddress port\n", argv[0]);
@@ -40,7 +43,7 @@ int main(int argn, char** argv){
 
     listening(address, port);
     while(1){
-        usleep(5000);
+        usleep(10000);
         get_connections(connections);
         for(i=0;i<MAX_CONNECTION_NO;i++)
             update_player(i, game_map, connections[i], &clients[i], players);
@@ -140,6 +143,7 @@ void update_player(int i, map m, connection conn, client_state* state, player* p
     }
     else{
         state->connection_state = 0;
+        p[i].online = 0;
     }
 }
 
@@ -235,6 +239,12 @@ void init_map(map m){
 }
 
 void game_logic(int i, map m, player* p, connection conn){
+    recv_string(conn, msg, &msg_len);
+    if(msg_len > 0){
+        if(msg[0] == 0){//receive player name
+            memcpy(p[i].name, &msg[1], 10);
+        }
+    }
     //sizeof(player)*8 = 36 * 8 = 288
     char state_buffer[289];
     state_buffer[0] = 3;//send game state
