@@ -209,18 +209,17 @@ void map_draw(map m, player* players, int id){
                 }
 
                 int tch = tank_ch[tank_y][tank_x];
-                if(tch == ' ')put = ' ';
-                else if(tch == 'X')put = dirt_symbol[1];
-                else put = tank_symbol[tch - 'a'];
+                if(tch != ' '){
+                    if(tch == 'X')put = dirt_symbol[1];
+                    else put = tank_symbol[tch - 'a'];
 
-                int tfg = tank_fg[tank_y][tank_x];
-                if(tfg == ' ')fg = RED|GREEN|BLUE;
-                else if(tfg == 'X')fg = decal;
-                else fg = tfg - 'a';
+                    int tfg = tank_fg[tank_y][tank_x];
+                    if(tfg == 'X')fg = decal;
+                    else fg = tfg - 'a';
 
-                int tbg = tank_bg[tank_y][tank_x];
-                if(tbg == ' ')bg = BLACK;
-                else bg = tbg - 'a';
+                    int tbg = tank_bg[tank_y][tank_x];
+                    bg = tbg - 'a';
+                }
             }
         }
         if(cell == MAP_GRASS){

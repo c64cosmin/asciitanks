@@ -233,7 +233,7 @@ void init_map(map m){
         int set = MAP_DIRT;
         if(stone_gen(x,y))set = MAP_STONE;
         if(grass_gen(x,y))set = MAP_GRASS;
-        if(spawn_gen(m,x,y))set = MAP_EMPTY;
+        //if(spawn_gen(m,x,y))set = MAP_EMPTY;
         set_map(m,x,y,set);
     }
 }
