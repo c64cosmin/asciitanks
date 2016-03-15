@@ -14,6 +14,7 @@ void update_player(int i, map m, connection conn, client_state* state, player* p
 void init_map(map m);
 void get_spawn_point(map m, int i, int* x,int* y);
 void game_logic(int i, map m, player* p, connection conn);
+char test_collision(int i, player* p, map m, int move_x, int move_y);
 
 unsigned char msg[4096];
 int msg_len;
@@ -28,7 +29,7 @@ int main(int argn, char** argv){
 
     connection connections[MAX_CONNECTION_NO];
 
-    map game_map = new_map(600,600);
+    map game_map = new_map(100,100);
     init_map(game_map);
 
     player players[MAX_CONNECTION_NO];
@@ -247,19 +248,27 @@ void game_logic(int i, map m, player* p, connection conn){
         if(msg[0] == 1){//receive player key press
             char key = msg[1];
             if(msg[1] == 'w'){
-                p[i].pos_y--;
+                if(!test_collision(i, p, m, 0, -1)){
+                    p[i].pos_y--;
+                }
                 p[i].direction = 0;
             }
             if(msg[1] == 's'){
-                p[i].pos_y++;
+                if(!test_collision(i, p, m, 0,  1)){
+                    p[i].pos_y++;
+                }
                 p[i].direction = 2;
             }
             if(msg[1] == 'a'){
-                p[i].pos_x--;
+                if(!test_collision(i, p, m, -1, 0)){
+                    p[i].pos_x--;
+                }
                 p[i].direction = 3;
             }
             if(msg[1] == 'd'){
-                p[i].pos_x++;
+                if(!test_collision(i, p, m,  1, 0)){
+                    p[i].pos_x++;
+                }
                 p[i].direction = 1;
             }
         }
@@ -270,4 +279,55 @@ void game_logic(int i, map m, player* p, connection conn){
     int it;
     memcpy((void*)&state_buffer[1], (void*)p, sizeof(player)*8); 
     send_string(conn, state_buffer, 289);
+}
+
+char two_player_collision(int i, int j, player* p, int move_x, int move_y){
+    int px0_0 = p[i].pos_x-3 + move_x;
+    int py0_0 = p[i].pos_y-3 + move_y;
+    int px0_1 = p[i].pos_x+3 + move_x;
+    int py0_1 = p[i].pos_y+3 + move_y;
+
+    int px1_0 = p[j].pos_x-3;
+    int py1_0 = p[j].pos_y-3;
+    int px1_1 = p[j].pos_x+3;
+    int py1_1 = p[j].pos_y+3;
+
+    if(px0_0>=px1_0 && px0_0<=px1_1 &&
+       py0_0>=py1_0 && py0_0<=py1_1)return 1;
+
+    if(px0_1>=px1_0 && px0_1<=px1_1 &&
+       py0_0>=py1_0 && py0_0<=py1_1)return 1;
+
+    if(px0_0>=px1_0 && px0_0<=px1_1 &&
+       py0_1>=py1_0 && py0_1<=py1_1)return 1;
+
+    if(px0_1>=px1_0 && px0_1<=px1_1 &&
+       py0_1>=py1_0 && py0_1<=py1_1)return 1;
+
+    return 0;
+}
+
+char map_collision(int i, player* p, int move_x, int move_y){
+    player pp = p[i];
+
+    if(move_x == 1){
+        
+    }
+    if(move_x == -1){
+    }
+    if(move_y == 1){
+    }
+    if(move_y == -1){
+    }
+}
+
+char test_collision(int i, player* p, map m, int move_x, int move_y){
+    int j;
+    
+    for(j=0;j<8;j++){
+        if(i!=j)
+            if(two_player_collision(i, j, p, move_x, move_y))
+                return 1;
+    }
+    return 0;
 }
