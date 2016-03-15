@@ -125,11 +125,16 @@ void map_draw_init(){
 }
 
 void map_draw(map m, int camera_x, int camera_y){
+    int player_x = 8;
+    int player_y = 30;
+
     if(m.map_data == 0)return;
     int x,y;
     for(x=0;x<MAP_SCREEN_X;x++)
     for(y=0;y<MAP_SCREEN_Y;y++){
-        char cell = get_map(m, x + camera_x, y + camera_y);
+        int mapx = x + camera_x;
+        int mapy = y + camera_y;
+        char cell = get_map(m, mapx, mapy);
         int put = ' ';
         int bg = BLACK;
         int fg = RED|GREEN|BLUE;
@@ -149,7 +154,10 @@ void map_draw(map m, int camera_x, int camera_y){
             bg = GREEN;
             fg = GREEN|BRIGHT;
         }
-        if(x>=0&&y>=0&&x<7&&y<7){
+        
+        int tank_x = mapx - player_x + 3;
+        int tank_y = mapy - player_y + 3;
+        if(tank_x>=0&&tank_y>=0&&tank_x<7&&tank_y<7){
             char** tank_ch;
             char** tank_fg;
             char** tank_bg;
@@ -190,17 +198,17 @@ void map_draw(map m, int camera_x, int camera_y){
                 tank_bg = tank_bg_l;
             }
 
-            int tch = tank_ch[y][x];
+            int tch = tank_ch[tank_y][tank_x];
             if(tch == ' ')put = ' ';
             else if(tch == 'X')put = dirt_symbol[1];
             else put = tank_symbol[tch - 'a'];
 
-            int tfg = tank_fg[y][x];
+            int tfg = tank_fg[tank_y][tank_x];
             if(tfg == ' ')fg = RED|GREEN|BLUE;
             else if(tfg == 'X')fg = decal;
             else fg = tfg - 'a';
 
-            int tbg = tank_bg[y][x];
+            int tbg = tank_bg[tank_y][tank_x];
             if(tbg == ' ')bg = BLACK;
             else bg = tbg - 'a';
         }
