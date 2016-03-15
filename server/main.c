@@ -248,15 +248,19 @@ void game_logic(int i, map m, player* p, connection conn){
             char key = msg[1];
             if(msg[1] == 'w'){
                 p[i].pos_y--;
+                p[i].direction = 0;
             }
             if(msg[1] == 's'){
                 p[i].pos_y++;
+                p[i].direction = 2;
             }
             if(msg[1] == 'a'){
                 p[i].pos_x--;
+                p[i].direction = 3;
             }
             if(msg[1] == 'd'){
                 p[i].pos_x++;
+                p[i].direction = 1;
             }
         }
     }

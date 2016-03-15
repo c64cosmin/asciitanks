@@ -65,9 +65,9 @@ void map_draw_init(){
     tank_sprite[0] = "\u25a0";//tank tracks//a
 
     tank_sprite[1] = "\u25b2";//triangles up//b
-    tank_sprite[2] = "\u25b6";//triangles right//c
+    tank_sprite[2] = "\u25ba";//triangles right//c
     tank_sprite[3] = "\u25bc";//triangles down//d
-    tank_sprite[4] = "\u25c0";//triangles left//e
+    tank_sprite[4] = "\u25c4";//triangles left//e
 
     tank_sprite[5] = "\u2565";//cannon tip up//f
     tank_sprite[6] = "\u2561";//cannon tip right//g
