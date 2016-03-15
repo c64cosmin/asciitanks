@@ -124,9 +124,18 @@ void map_draw_init(){
     }
 }
 
-void map_draw(map m, int camera_x, int camera_y){
-    int player_x = 8;
-    int player_y = 30;
+void map_draw(map m, player* players, int id){
+    int camera_x;
+    int camera_y;
+    int i;
+
+    //find client player position
+    for(i=0;i<8;i++){
+        if(players[i].id == id){
+            camera_x = players[i].pos_x - MAP_SCREEN_X/2;
+            camera_y = players[i].pos_y - MAP_SCREEN_Y/2;
+        }
+    }
 
     if(m.map_data == 0)return;
     int x,y;
@@ -149,68 +158,73 @@ void map_draw(map m, int camera_x, int camera_y){
             bg = RED|GREEN|BLUE;
             fg = BLACK|BRIGHT;
         }
+        
+        for(i=0;i<8;i++){
+            int player_x = players[i].pos_x;
+            int player_y = players[i].pos_y;
+
+            int tank_x = mapx - player_x + 3;
+            int tank_y = mapy - player_y + 3;
+            if(tank_x>=0&&tank_y>=0&&tank_x<7&&tank_y<7){
+                char** tank_ch;
+                char** tank_fg;
+                char** tank_bg;
+                int dir = players[i].direction;
+                int player = players[i].id;
+                int decal = 0;
+
+                if(player == 0)decal = RED|BRIGHT;
+                if(player == 1)decal = BLUE|BRIGHT;
+                if(player == 2)decal = GREEN|BRIGHT;
+                if(player == 3)decal = RED|GREEN|BRIGHT;
+                if(player == 4)decal = BLUE|GREEN|BRIGHT;
+                if(player == 5)decal = RED|BLUE|BRIGHT;
+                if(player == 6)decal = RED|GREEN|BLUE|BRIGHT;
+                if(player == 7)decal = RED|GREEN;
+
+                if(dir == 0){
+                    tank_ch = tank_ch_u;
+                    tank_fg = tank_fg_u;
+                    tank_bg = tank_bg_u;
+                }
+
+                if(dir == 1){
+                    tank_ch = tank_ch_r;
+                    tank_fg = tank_fg_r;
+                    tank_bg = tank_bg_r;
+                }
+
+                if(dir == 2){
+                    tank_ch = tank_ch_d;
+                    tank_fg = tank_fg_d;
+                    tank_bg = tank_bg_d;
+                }
+
+                if(dir == 3){
+                    tank_ch = tank_ch_l;
+                    tank_fg = tank_fg_l;
+                    tank_bg = tank_bg_l;
+                }
+
+                int tch = tank_ch[tank_y][tank_x];
+                if(tch == ' ')put = ' ';
+                else if(tch == 'X')put = dirt_symbol[1];
+                else put = tank_symbol[tch - 'a'];
+
+                int tfg = tank_fg[tank_y][tank_x];
+                if(tfg == ' ')fg = RED|GREEN|BLUE;
+                else if(tfg == 'X')fg = decal;
+                else fg = tfg - 'a';
+
+                int tbg = tank_bg[tank_y][tank_x];
+                if(tbg == ' ')bg = BLACK;
+                else bg = tbg - 'a';
+            }
+        }
         if(cell == MAP_GRASS){
             put = grass_symbol[random(seed, 5)];
             bg = GREEN;
             fg = GREEN|BRIGHT;
-        }
-        
-        int tank_x = mapx - player_x + 3;
-        int tank_y = mapy - player_y + 3;
-        if(tank_x>=0&&tank_y>=0&&tank_x<7&&tank_y<7){
-            char** tank_ch;
-            char** tank_fg;
-            char** tank_bg;
-            int dir = 3;
-            int player = 1;
-            int decal = 0;
-
-            if(player == 0)decal = RED|BRIGHT;
-            if(player == 1)decal = BLUE|BRIGHT;
-            if(player == 2)decal = GREEN|BRIGHT;
-            if(player == 3)decal = RED|GREEN|BRIGHT;
-            if(player == 4)decal = BLUE|GREEN|BRIGHT;
-            if(player == 5)decal = RED|BLUE|BRIGHT;
-            if(player == 6)decal = RED|GREEN|BLUE|BRIGHT;
-            if(player == 7)decal = RED|GREEN;
-
-            if(dir == 0){
-                tank_ch = tank_ch_u;
-                tank_fg = tank_fg_u;
-                tank_bg = tank_bg_u;
-            }
-
-            if(dir == 1){
-                tank_ch = tank_ch_r;
-                tank_fg = tank_fg_r;
-                tank_bg = tank_bg_r;
-            }
-
-            if(dir == 2){
-                tank_ch = tank_ch_d;
-                tank_fg = tank_fg_d;
-                tank_bg = tank_bg_d;
-            }
-
-            if(dir == 3){
-                tank_ch = tank_ch_l;
-                tank_fg = tank_fg_l;
-                tank_bg = tank_bg_l;
-            }
-
-            int tch = tank_ch[tank_y][tank_x];
-            if(tch == ' ')put = ' ';
-            else if(tch == 'X')put = dirt_symbol[1];
-            else put = tank_symbol[tch - 'a'];
-
-            int tfg = tank_fg[tank_y][tank_x];
-            if(tfg == ' ')fg = RED|GREEN|BLUE;
-            else if(tfg == 'X')fg = decal;
-            else fg = tfg - 'a';
-
-            int tbg = tank_bg[tank_y][tank_x];
-            if(tbg == ' ')bg = BLACK;
-            else bg = tbg - 'a';
         }
         gfx_put(x, y, put, bg, fg);
     }

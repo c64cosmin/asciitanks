@@ -29,20 +29,30 @@ int main(int argn, char** argv){
     connection c = new_connection(address, port);
     char running = 1;
     map game_map;
-    player p;
+    //init players
+    player* players = (player*)malloc(sizeof(player)*8);
+    int i;
+    for(i=0;i<8;i++){
+        players[i].id = i;
+        players[i].pos_x = i*10;
+        players[i].pos_y = i*3;
+        players[i].direction = i%4;
+    }
     game_map.map_data = 0;
 
     int xc=0,yc=0;
 
     while(connection_alive(c) && running){
-        update_player(&game_map, c, &p); 
+        update_player(&game_map, c, players); 
         char key = kbd_get();
         if(key == KBD_ESC)running = 0;
         if(key == 'a')xc--;
         if(key == 'd')xc++;
         if(key == 'w')yc--;
         if(key == 's')yc++;
-        map_draw(game_map, xc, yc);
+        players[3].pos_x=xc;
+        players[3].pos_y=yc;
+        map_draw(game_map, players, 3);
         gfx_blit();
     }
     gfx_clear();
