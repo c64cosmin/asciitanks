@@ -43,7 +43,7 @@ int main(int argn, char** argv){
 
     listening(address, port);
     while(1){
-        usleep(10000);
+        usleep(70000);
         get_connections(connections);
         for(i=0;i<MAX_CONNECTION_NO;i++)
             update_player(i, game_map, connections[i], &clients[i], players);
