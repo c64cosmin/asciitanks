@@ -18,8 +18,7 @@ char test_collision(int i, player* p, map m, int move_x, int move_y);
 
 unsigned char msg[4096];
 int msg_len;
-void bullet_update(player*p, map m);
-int bullet_trigger;
+void bullet_update(int i, player* p, map m);
 
 int main(int argn, char** argv){
     if(argn != 3){
@@ -33,8 +32,6 @@ int main(int argn, char** argv){
 
     map game_map = new_map(100,100);
     init_map(game_map);
-
-    bullet_trigger = 0;
 
     player players[MAX_CONNECTION_NO];
     client_state clients[MAX_CONNECTION_NO];
@@ -51,17 +48,18 @@ int main(int argn, char** argv){
     while(1){
         usleep(70000);
         get_connections(connections);
-        bullet_trigger++;
-        if(bullet_trigger > 3)bullet_trigger = 0;
         for(i=0;i<MAX_CONNECTION_NO;i++){
-            if(bullet_trigger == 0)bullet_update(&players[i], game_map);
+            bullet_update(i, players, game_map);
             update_player(i, game_map, connections[i], &clients[i], players);
+            bullet_update(i, players, game_map);
         }
     }
     return 0;
 }
 
-void bullet_update(player* p, map m){
+void bullet_update(int i, player* players, map m){
+    player* p = &players[i];
+
     if(p->bullet_is == 0)
         return;
 
@@ -90,6 +88,17 @@ void bullet_update(player* p, map m){
     }
     else{
         p->bullet_is = 0;
+    }
+
+    int j;
+    for(j=0;j<8;j++)
+    if(i!=j){
+        int px = players[j].pos_x;
+        int py = players[j].pos_y;
+        int x = p->bullet_pos_x;
+        int y = p->bullet_pos_y;
+        if(x >= px-3 && x <= px+3 && y >= py-3 && y <= py+3)
+            players[j].online = 0;
     }
 }
 
@@ -335,14 +344,12 @@ void game_logic(int i, map m, player* p, connection conn){
                 p[i].direction = 1;
             }
             if(msg[1] == ' '){
-                if(p[i].bullet_is == 0){
+                if(p[i].online && p[i].bullet_is == 0){
                     put_bullet(&p[i]);
                 }
             }
         }
     }
-    //bullet update
-    bullet_update(&p[i], m);
     //sizeof(player)*8 = 36 * 8 = 288
     char state_buffer[289];
     state_buffer[0] = 3;//send game state

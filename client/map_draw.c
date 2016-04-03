@@ -223,8 +223,7 @@ void map_draw(map m, player* players, int id){
             }
         }
         for(i=0;i<8;i++){
-            if(players[i].online && players[i].bullet_is)
-            if(players[i].bullet_pos_x == mapx && players[i].bullet_pos_y == mapy){
+            if(players[i].bullet_is && players[i].bullet_pos_x == mapx && players[i].bullet_pos_y == mapy){
                 put = tank_symbol[players[i].bullet_direction + 1];
                 bg = get_player_color(players[i].id) ^ BRIGHT;
                 fg = get_player_color(players[i].id);
