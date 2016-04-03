@@ -18,6 +18,8 @@ char test_collision(int i, player* p, map m, int move_x, int move_y);
 
 unsigned char msg[4096];
 int msg_len;
+void bullet_update(player*p, map m);
+int bullet_trigger;
 
 int main(int argn, char** argv){
     if(argn != 3){
@@ -32,6 +34,8 @@ int main(int argn, char** argv){
     map game_map = new_map(100,100);
     init_map(game_map);
 
+    bullet_trigger = 0;
+
     player players[MAX_CONNECTION_NO];
     client_state clients[MAX_CONNECTION_NO];
 
@@ -40,17 +44,55 @@ int main(int argn, char** argv){
     for(i=0;i<8;i++){
         players[i].id = i;
         players[i].online = 0;
+        players[i].bullet_is = 0;
     }
 
     listening(address, port);
     while(1){
         usleep(70000);
         get_connections(connections);
-        for(i=0;i<MAX_CONNECTION_NO;i++)
+        bullet_trigger++;
+        if(bullet_trigger > 3)bullet_trigger = 0;
+        for(i=0;i<MAX_CONNECTION_NO;i++){
+            if(bullet_trigger == 0)bullet_update(&players[i], game_map);
             update_player(i, game_map, connections[i], &clients[i], players);
+        }
     }
     return 0;
 }
+
+void bullet_update(player* p, map m){
+    if(p->bullet_is == 0)
+        return;
+
+    int move_x;
+    int move_y;
+    if(p->bullet_direction == 0){
+        move_x = 0;
+        move_y = -1;
+    }
+    if(p->bullet_direction == 1){
+        move_x = 1;
+        move_y = 0;
+    }
+    if(p->bullet_direction == 2){
+        move_x = 0;
+        move_y = 1;
+    }
+    if(p->bullet_direction == 3){
+        move_x = -1;
+        move_y = 0;
+    }
+
+    if(get_map(m, p->bullet_pos_x + move_x, p->bullet_pos_y + move_y) != MAP_STONE){
+        p->bullet_pos_x += move_x;
+        p->bullet_pos_y += move_y;
+    }
+    else{
+        p->bullet_is = 0;
+    }
+}
+
 
 void update_player(int i, map m, connection conn, client_state* state, player* p){
     if(connection_alive(conn)){
@@ -239,6 +281,27 @@ void init_map(map m){
     }
 }
 
+void put_bullet(player* p){
+    p->bullet_is = 1;
+    p->bullet_direction = p->direction;
+    if(p->direction == 0){
+        p->bullet_pos_x = p->pos_x;
+        p->bullet_pos_y = p->pos_y - 3;
+    }
+    if(p->direction == 1){
+        p->bullet_pos_x = p->pos_x + 3;
+        p->bullet_pos_y = p->pos_y;
+    }
+    if(p->direction == 2){
+        p->bullet_pos_x = p->pos_x;
+        p->bullet_pos_y = p->pos_y + 3;
+    }
+    if(p->direction == 3){
+        p->bullet_pos_x = p->pos_x - 3;
+        p->bullet_pos_y = p->pos_y;
+    }
+}
+
 void game_logic(int i, map m, player* p, connection conn){
     recv_string(conn, msg, &msg_len);
     if(msg_len > 0){
@@ -271,8 +334,15 @@ void game_logic(int i, map m, player* p, connection conn){
                 }
                 p[i].direction = 1;
             }
+            if(msg[1] == ' '){
+                if(p[i].bullet_is == 0){
+                    put_bullet(&p[i]);
+                }
+            }
         }
     }
+    //bullet update
+    bullet_update(&p[i], m);
     //sizeof(player)*8 = 36 * 8 = 288
     char state_buffer[289];
     state_buffer[0] = 3;//send game state
@@ -307,18 +377,42 @@ char two_player_collision(int i, int j, player* p, int move_x, int move_y){
     return 0;
 }
 
-char map_collision(int i, player* p, int move_x, int move_y){
+char map_collision(int i, player* p, map m, int move_x, int move_y){
     player pp = p[i];
-
+    int it;
     if(move_x == 1){
-        
+        for(it=0;it<7;it++){
+            int x = pp.pos_x + 4;
+            int y = pp.pos_y - 3 + it;
+            if(get_map(m, x, y) == MAP_STONE)
+                return 1;
+        }
     }
     if(move_x == -1){
+        for(it=0;it<7;it++){
+            int x = pp.pos_x - 4;
+            int y = pp.pos_y - 3 + it;
+            if(get_map(m, x, y) == MAP_STONE)
+                return 1;
+        }
     }
     if(move_y == 1){
+        for(it=0;it<7;it++){
+            int x = pp.pos_x - 3 + it;
+            int y = pp.pos_y + 4;
+            if(get_map(m, x, y) == MAP_STONE)
+                return 1;
+        }
     }
     if(move_y == -1){
+        for(it=0;it<7;it++){
+            int x = pp.pos_x - 3 + it;
+            int y = pp.pos_y - 4;
+            if(get_map(m, x, y) == MAP_STONE)
+                return 1;
+        }
     }
+    return 0;
 }
 
 char test_collision(int i, player* p, map m, int move_x, int move_y){
@@ -328,6 +422,8 @@ char test_collision(int i, player* p, map m, int move_x, int move_y){
         if(i!=j)
             if(two_player_collision(i, j, p, move_x, move_y))
                 return 1;
+        if(map_collision(i, p, m, move_x, move_y))
+            return 1;
     }
     return 0;
 }
